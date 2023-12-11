@@ -42,7 +42,7 @@ public  OnSendMessage(const ip[], port) {
     }
     
     GetParam("message", message, sizeof message);
-	printf("ID = %d | message = %s", id, message);
+    printf("ID = %d | message = %s", id, message);
     SendClientMessage(id, -1, message);
 
     SetContent("OK :D");
@@ -57,7 +57,7 @@ public OnGameModeInit()
     RegisterHandle("/hello/", "OnSendMessage"); 	// LINK: http://localhost:8080/hello/
     StartServer("localhost", 8080);		 			// LINK: http://localhost:8080/
     AddToken("token12345", -1); 					// this token does not contain rate limit
-    AddToken("token54321", 20); 					// this token contains rate limit of 50 requests per minute
+    AddToken("token54321", 50); 					// this token contains rate limit of 50 requests per minute
     ToggleRequiredToken(true);                      // activates the need for a token to make requests
 	
     /* To make the request with the token we must place it in the headers like this
