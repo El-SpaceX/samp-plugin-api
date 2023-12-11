@@ -42,7 +42,7 @@ public  OnSendMessage(const ip[], port) {
     }
     
     GetParam("message", message, sizeof message);
-	printf("ID = %d | message = %s", id, message);
+    printf("ID = %d | message = %s", id, message);
     SendClientMessage(id, -1, message);
 
     SetContent("OK :D");
