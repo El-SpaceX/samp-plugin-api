@@ -1,0 +1,1 @@
+# samp-plugin-api
