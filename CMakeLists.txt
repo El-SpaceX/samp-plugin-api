@@ -15,7 +15,7 @@ add_samp_plugin(${PROJECT_NAME}
 	src/plugin.hpp
 	src/plugin.cpp
 	src/script.hpp
-	scr/script.cpp
+	src/script.cpp
 	src/api.hpp
 	src/api.cpp
 
