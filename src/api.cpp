@@ -3,10 +3,11 @@
 
 namespace APIServer {
     
-    inline std::string API::GetBasePath(const std::string& path) {
-        size_t pos;
+    API api;
 
-        pos = path.find('/', 1);
+    inline std::string API::GetBasePath(const std::string& path) 
+    {
+        const size_t pos = path.find('/', 1);
         if (pos != std::string::npos) {
             return path.substr(0, pos + 1);
         }
@@ -15,13 +16,13 @@ namespace APIServer {
 
 
 
-    inline API::TOKEN_CHECK API::CheckRatelimit(const Token& token) {
+    inline API::TokenVerify API::CheckRatelimit(const Token& token) {
 
         //-1 == no limit
-        API::s_TokenInfo& tokenInfo = tokens[token];
+        TokenInfo& tokenInfo = tokens[token];
 
         if (tokenInfo.iRatelimit == -1) {
-            return OK;
+            return TokenVerify::OK;
         }
 
         const auto now = std::chrono::steady_clock::now();
@@ -29,24 +30,24 @@ namespace APIServer {
         if (diference > std::chrono::minutes(1)) {
             tokenInfo.iRequests = 0;
             tokenInfo.lastTime = std::chrono::steady_clock::now();
-            return OK;
+            return TokenVerify::OK;
         }
 
         
         tokenInfo.iRequests++;
         if (tokenInfo.iRequests > static_cast<unsigned int>(tokenInfo.iRatelimit)) {
-            return RATELIMIT_EXCEEDED;
+            return TokenVerify::RATELIMIT_EXCEEDED;
         }
 
-        return OK;
+        return TokenVerify::OK;
     }
 
    
 
-    inline API::TOKEN_CHECK API::CheckToken(const Request& req) {
+    inline API::TokenVerify API::CheckToken(const Request& req) {
 
         if (!this->GetTokenRequired())
-            return OK;
+            return TokenVerify::OK;
 
         if (!this->tokens.empty()) {
             if (req.has_header("Authorization")) {
@@ -56,18 +57,18 @@ namespace APIServer {
                 }
             }
         }
-        return TOKEN_INVALID;
+        return TokenVerify::TOKEN_INVALID;
     }
 
     void API::handle_request(const Request& req, Response& res) {
 
-        auto it = this->handlers.find(this->GetBasePath(req.path));
+        const auto it = this->handlers.find(this->GetBasePath(req.path));
         if (it != this->handlers.end()) {
 
             //token and ratelimit verify
-            const TOKEN_CHECK allowed = this->CheckToken(req);
-            if (allowed != OK) {
-                res.status = allowed == RATELIMIT_EXCEEDED ? 429 : 401;
+            const TokenVerify allowed = this->CheckToken(req);
+            if (allowed != TokenVerify::OK) {
+                res.status = allowed == TokenVerify::RATELIMIT_EXCEEDED ? 429 : 401;
                 return;
             }
 
@@ -76,7 +77,7 @@ namespace APIServer {
 
             
             //executes the callback to handle the response.
-            cell ret = it->second->Exec(req.remote_addr, req.remote_port);
+            const cell ret = it->second->Exec(req.remote_addr, req.remote_port);
 
 
 
@@ -86,18 +87,17 @@ namespace APIServer {
         }
         else {
             res.status = 404;
-            res.set_content("Not Found", "text/plain");
         }
     }
 
-    bool API::StartServer(const std::string& host, const int port) {
+    bool API::StartServer(const std::string& host, int port) {
         if (this->IsAPIRunning())
             return false;
 
         this->sIP = host;
         this->iPort = port;
 
-        //thread separada pra API
+        //separate thread for the API
         this->thread_s = std::thread([&]() {
             server.Get("/.*", [&](const Request& req, Response& res) {
                     handle_request(req, res);
@@ -107,7 +107,8 @@ namespace APIServer {
         return true;
     }
 
-    bool API::StopServer() {
+    bool API::StopServer() 
+    {
         if (!this->IsAPIRunning())
             return 0;
 
@@ -115,5 +116,4 @@ namespace APIServer {
         this->server.stop();
         return 1;
     }
-    API api;
 }

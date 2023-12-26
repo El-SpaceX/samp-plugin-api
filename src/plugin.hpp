@@ -5,11 +5,13 @@
 #include "api.hpp"
 #include "script.hpp"
 
-class Plugin : public ptl::AbstractPlugin<Plugin, Script> {
+class Plugin : public ptl::AbstractPlugin<Plugin, Script> 
+{
 public: 
-	inline const char* Name() { return "api-plugin"; };
+	inline const char* Name() { return "samp-plugin-api"; }
 	bool OnLoad();
 	bool OnUnload();
+private:
 };
 
 #endif

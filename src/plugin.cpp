@@ -1,6 +1,7 @@
 #include "plugin.hpp"
 
-bool Plugin::OnLoad() {
+bool Plugin::OnLoad() 
+{
 	//callbacks
 	RegisterNative<&Script::n_RegisterHandle>("RegisterHandle");
 	RegisterNative<&Script::n_DeleteHandle>("DeleteHandle");
@@ -35,7 +36,8 @@ bool Plugin::OnLoad() {
 	return true;
 }
 
-bool Plugin::OnUnload() {
+bool Plugin::OnUnload() 
+{
 	APIServer::api.StopServer();
 	Log("plugin unloaded.");
 	return true;
