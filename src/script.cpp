@@ -13,7 +13,7 @@ cell Script::n_RegisterHandle(const std::string pattern, const std::string callb
         return 0;
     }
 
-    if (!pattern.empty())
+    if (pattern.empty())
     {
         Log("%s handle pattern is empty.", callback.c_str());
         return 0;
