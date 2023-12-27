@@ -1,139 +1,66 @@
 #ifndef _API_H_
 #define _API_H_
 
-#include <unordered_map>
+#include <cpp-httplib/httplib.h>
+#include <samp-ptl/ptl.h>
+#include <chrono>
 #include <string>
 
-#include <samp-ptl/ptl.h>
-#include <cpp-httplib/httplib.h>
-#include "script.hpp"
 
-namespace APIServer 
+using namespace httplib;
+using PublicPtr = std::shared_ptr<ptl::Public>;
+
+
+class API 
 {
-    
-    using namespace httplib;
-    using PublicPtr = std::shared_ptr<ptl::Public>;
-    using Token = std::string;
-
-    class API 
-    {
-    private:
-        struct TokenInfo
-        {
-            int iRatelimit;
-            std::chrono::steady_clock::time_point lastTime;
-            unsigned int iRequests;
-        };
-
-        Server server;
-        std::unordered_map<std::string, PublicPtr> handlers;
-        std::unordered_map<Token, TokenInfo> tokens;
+private:
+	Server server;
+	std::string sIP = "localhost";
+	unsigned short iPort = 80;
+	Request* pReqTemp = nullptr;
+	Response* pResTemp = nullptr;
+	std::thread serverThread;
 
 
-        std::string sIP = "localhost";
-        int iPort = 8080;
-        bool bTokenRequired = false;
+	//token
+	struct TokenInfo
+	{
+		int iRatelimit;
+		unsigned int iRequests;
+		std::chrono::steady_clock::time_point lastTime;
+	};
+	std::unordered_map<std::string, TokenInfo> tokens;
+	bool bRequiredToken = false;
 
+public:
+	enum class TokenVerify : char
+	{
+		OK,
+		RATE_LIMIT_EXCEEDED,
+		TOKEN_INVALID
+	};
 
-        std::thread thread_s;
+	TokenVerify CheckToken(const std::string& token);
+	inline void AddToken(const std::string& token, int ratelimit) { this->tokens.insert(std::pair(token, TokenInfo{ratelimit, 0, std::chrono::steady_clock::now()})); }
+	inline void RemoveToken(const std::string& token) { this->tokens.erase(token); }
+	inline void ToggleTokenRequired(bool toggle) { this->bRequiredToken = true; }
+	inline bool IsTokenRequired() const { return this->bRequiredToken; }
+	TokenInfo* GetTokenInfo(const std::string& token);
+	inline bool TokenExists(const std::string& token) { return (this->tokens.find(token) != this->tokens.end()); }
 
-        //handlers pointers
-        Request* pReqTemp = nullptr; 
-        Response* pResTemp = nullptr;
+	inline void SetRequest(Request* request) { this->pReqTemp = request; }
+	inline void SetResponse(Response* response) { this->pResTemp = response; }
 
-        void handle_request(const Request& req, Response& res);
-        inline std::string GetBasePath(const std::string& path);
-    public:
-        enum class TokenVerify
-        {
-            TOKEN_INVALID,
-            RATELIMIT_EXCEEDED,
-            OK
-        };
+	inline Request* GetRequest() const { return this->pReqTemp; }
+	inline Response* GetResponse() const { return this->pResTemp; }
 
-        bool StartServer(const std::string &host, const int port);
-        bool StopServer();
-       
+	inline bool IsRunning() const { return this->server.is_running(); }
 
-        //token & ratelimit verify
-        inline TokenVerify CheckToken(const Request& req);
-        inline TokenVerify CheckRatelimit(const Token& token);
-
-        inline bool IsAPIRunning() {
-            return this->server.is_running();
-        }
-
-        inline Response* GetCurrentResponseTemp() 
-        { 
-            return this->pResTemp;
-        }
-        inline void SetCurrentResponseTemp(Response* res) 
-        { 
-            this->pResTemp = res;
-        }
-       
-        inline Request* GetCurrentRequestTemp() 
-        { 
-            return this->pReqTemp;
-        }
-        inline void SetCurrentRequestTemp(Request* req) 
-        { 
-            this->pReqTemp = req; 
-        }
-
-        inline void AddHandler(const std::string& pattern, PublicPtr &publicPtr) 
-        {  
-            this->handlers[pattern] = publicPtr;
-        }
-        inline void RemoveHandler(const std::string& pattern) 
-        { 
-            this->handlers.erase(pattern);
-        }
-
-        inline void ToggleTokenRequired(bool toggle) 
-        { 
-            this->bTokenRequired = toggle;
-        }
-        inline bool GetTokenRequired() 
-        { 
-            return this->bTokenRequired; 
-        }
-        inline bool ExistsToken(const Token& token) 
-        { 
-            return this->tokens.find(token) != this->tokens.end();
-        }
-
-        inline void AddToken(const Token& token, int ratelimit) 
-        {
-            this->tokens[token] = { ratelimit, std::chrono::steady_clock::now(), 0};
-        }
-
-        inline void RemoveToken(const Token& token) 
-        { 
-            this->tokens.erase(token);
-        }
-
-        inline void SetRateLimit(const Token& token, int ratelimit) 
-        {
-            const auto it = this->tokens.find(token);
-            if (it != this->tokens.end())
-            {
-                it->second.iRatelimit = ratelimit;
-            }
-        }
-
-        inline int GetRateLimit(const Token& token) 
-        {
-            const auto it = this->tokens.find(token);
-            if (it != this->tokens.end())
-            {
-                return it->second.iRatelimit;
-            }
-            return 0;
-        }
-
-    };
-    extern API api;
-    
+	bool Start(const std::string& host, unsigned short port);
+	bool Stop();
+	bool AddGet(const std::string& pattern, PublicPtr& callbackPointer);
 };
+
+extern API api;
 #endif
+

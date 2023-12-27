@@ -4,9 +4,9 @@
 #include <samp-ptl/ptl.h>
 #include <cpp-httplib/httplib.h>
 
-#include "api.hpp"
 #include "script.hpp"
 #include "plugin.hpp"
+#include "api.hpp"
 
 
 #endif

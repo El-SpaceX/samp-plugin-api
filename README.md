@@ -1,9 +1,9 @@
 # samp-plugin-api
 
-This plugin allows you to run an API on samp-server, being able to manipulate what it will respond to
 
-NOTE: I'm still studying C++, probably many things could be improved in this code (some changes that should sometimes be mandatory)
+I created this plugin as a study project. In summary, it allows you to create an API within samp-server.exe, enabling you to retrieve values and execute instructions through requests.
 
+The plugin also includes a security system with rate limiting using tokens, which can be activated or deactivated at your discretion. This ensures that requests are only processed if they are verified with the token. See some example [here](https://github.com/El-SpaceX/samp-plugin-api/tree/main/examples).
 
 ### Example
 
@@ -11,61 +11,48 @@ NOTE: I'm still studying C++, probably many things could be improved in this cod
 #include <a_samp>
 #include <samp-plugin-api>
 
-
-main() {}
-
-forward OnHelloWorld(const ip[], port);
-public  OnHelloWorld(const ip[], port) {
-    SetContent("Hello World");
-    //200 = OK
+API_CALLBACK OnSendAll(const ip[], const port)
+{
+    SendClientMessageToAll(-1, "ping!");
     return 200;
 }
 
-forward OnSendMessage(const ip[], port);
-public  OnSendMessage(const ip[], port) {
-    if(!HasParam("playerid") || !HasParam("message") ) {
-        SetContent("Use: http://localhost:8080/hello/?playerid=id&message=msg");
-        return 400;
+API_CALLBACK OnGetName(const ip[], const port)
+{
+    if(!API_HasPathParam("id"))
+    {
+        SetContent("Use: http://localhost:8080/GetName/:id");
+        return 500;
     }
 
-
-
-
-    static message[128], id;
-    id = GetParamInt("playerid");
+    new id = API_GetPathParamInt("id");
     
+    //cellmin == invalid number
     if(id == cellmin)
     {
-        //no number
-        SetContent("Use: http://localhost:8080/hello/?playerid=id&message=msg");
-        return 400;
+        SetContent("Use: http://localhost:8080/GetName/:id");
+        return 500;
     }
-    
-    GetParam("message", message, sizeof message);
-    printf("ID = %d | message = %s", id, message);
-    SendClientMessage(id, -1, message);
 
-    SetContent("OK :D");
-    //200 = OK
+    if(id < MAX_PLAYERS || id > 0)
+    {
+        SetContent("Id invalid.");
+        return 500;
+    }
+
+    new pName[MAX_PLAYER_NAME + 1];
+    GetPlayerName(id, pName, sizeof pName);
+    SetContent(pName);
     return 200;
 }
-
 
 public OnGameModeInit()
 {
-    RegisterHandle("/hi/", "OnHelloWorld"); 		// LINK: http://localhost:8080/hi/
-    RegisterHandle("/hello/", "OnSendMessage"); 	// LINK: http://localhost:8080/hello/
-    StartServer("localhost", 8080);		 	// LINK: http://localhost:8080/
-    AddToken("token12345", -1); 			// this token does not contain rate limit
-    AddToken("token54321", 50); 			// this token contains rate limit of 50 requests per minute
-    ToggleRequiredToken(true);                      	// activates the need for a token to make requests
-	
-    /* To make the request with the token we must place it in the headers like this
-    {
-        "Authorization" : "your-token"
-    }
-    */
-	
+    API_AddGet("/SendAll", "OnSendAll");
+    API_AddGet("/GetName/:id", "OnGetName");
+
+    API_Start("localhost", 8080); //Inicia a API no localhost na porta 8080. (http://localhost:8080/)
     return 1;
 }
+
 ```

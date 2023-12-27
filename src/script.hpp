@@ -9,37 +9,40 @@ using Token = std::string;
 class Script : public ptl::AbstractScript<Script>
 {
 public:
-    // handle/callbacks
-    cell n_RegisterHandle(const std::string pattern, const std::string callback);
-    cell n_DeleteHandle(const std::string pattern);
+	//server manager
+	cell n_Start(std::string host, cell port);
+	cell n_Stop();
+	cell n_IsRunning();
+	cell n_AddGet(std::string pattern, std::string callback);
 
-    // server manager
-    cell n_StartServer(std::string ip, int port);
-    cell n_StopServer();
-    cell n_IsServerRunning();
+	//response content
+	cell n_SetContent(std::string content);
+	cell n_SetContentHTML(std::string html);
 
-    // response content
-    cell n_SetContent(std::string content);
-    cell n_SetContentHTML(std::string html);
+	//token | ratelimit per minute
+	cell n_IsRequiredToken();
+	cell n_ToggleTokenRequired(cell toggle);
+	cell n_TokenExists(std::string token);
 
-    // token
-    cell n_AddToken(Token token, int ratelimit);
-    cell n_ExistsToken(Token token);
-    cell n_DeleteToken(Token token);
-    cell n_ToggleRequiredToken(int toggle);
-    cell n_GetRequiredToken();
+	cell n_AddToken(std::string token, cell ratelimit);
+	cell n_RemoveToken(std::string token);
+	cell n_GetRateLimit(std::string token);
+	cell n_SetRateLimit(std::string token, cell ratelimit);
 
-    // ratelimit
-    cell n_SetRateLimit(Token token, int ratelimit);
-    cell n_GetRateLimit(Token token);
+	//params
+	cell n_HasParam(std::string param);
+	cell n_GetParam(std::string param, cell* output, cell size);
+	cell n_GetParamInt(std::string param);
+	cell n_GetParamFloat(std::string param);
+	cell n_GetParamBool(std::string param);
 
-    // params
-    cell n_HasParam(std::string params_key);
-    cell n_GetParam(std::string params_key, cell *output, int size);
-    cell n_GetParamInt(std::string key);
-    cell n_GetParamFloat(std::string key);
-    cell n_GetNumParams();
 
+	//path params
+	cell n_HasPathParam(std::string param);
+	cell n_GetPathParam(std::string param, cell* output, cell size);
+	cell n_GetPathParamInt(std::string param);
+	cell n_GetPathParamFloat(std::string param);
+	cell n_GetPathParamBool(std::string param);
 private:
 };
 #endif
