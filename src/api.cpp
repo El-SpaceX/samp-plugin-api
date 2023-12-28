@@ -29,6 +29,7 @@ bool API::Stop()
 	return true;
 }
 
+
 bool API::AddGet(const std::string& pattern, PublicPtr& callbackPointer)
 {
 	if (!callbackPointer->Exists())
@@ -65,6 +66,47 @@ bool API::AddGet(const std::string& pattern, PublicPtr& callbackPointer)
 		this->SetResponse(nullptr);
 		return;
 	});
+
+	return true;
+}
+
+
+bool API::AddPost(const std::string& pattern, PublicPtr& callbackPointer)
+{
+	if (!callbackPointer->Exists())
+		return false;
+
+	this->server.Post(pattern, [=](const Request& request, Response& response) {
+		if (this->bRequiredToken)
+		{
+			if (!request.has_header("Authorization"))
+			{
+				response.status = 403;
+				return;
+			}
+
+			const auto status = this->CheckToken(request.get_header_value("Authorization"));
+			if (status != TokenVerify::OK)
+			{
+				//429 - Sent too many requests
+				//403 - Forbidden
+				response.status = (status == TokenVerify::RATE_LIMIT_EXCEEDED) ? 429 : 403;
+				return;
+			}
+		}
+
+
+		this->SetRequest(const_cast<Request*>(&request));
+		this->SetResponse(&response);
+
+
+		const cell ret = callbackPointer->Exec(request.remote_addr, request.remote_port);
+		this->GetResponse()->status = ret;
+
+		this->SetRequest(nullptr);
+		this->SetResponse(nullptr);
+		return;
+		});
 
 	return true;
 }

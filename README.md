@@ -48,7 +48,7 @@ API_CALLBACK OnGetName(const ip[], const port)
 
 public OnGameModeInit()
 {
-    API_AddGet("/SendAll", "OnSendAll");
+    API_AddPost("/SendAll", "OnSendAll");
     API_AddGet("/GetName/:id", "OnGetName");
 
     API_Start("localhost", 8080); //Inicia a API no localhost na porta 8080. (http://localhost:8080/)

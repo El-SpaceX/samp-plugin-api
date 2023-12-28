@@ -1,7 +1,7 @@
 #include "script.hpp"
 
 
-//server manager
+// -------------- server manager -------------- 
 cell Script::n_Start(std::string host, cell port)
 {
 	return api.Start(host, port);
@@ -16,6 +16,8 @@ cell Script::n_IsRunning()
 {
 	return api.IsRunning();
 }
+
+// -------------- callbacks manager -------------- 
 
 cell Script::n_AddGet(std::string pattern, std::string callback)
 {
@@ -42,7 +44,33 @@ cell Script::n_AddGet(std::string pattern, std::string callback)
 	return 1;
 }
 
-//token | rate limit per minute
+cell Script::n_AddPost(std::string pattern, std::string callback)
+{
+	if (pattern.empty())
+	{
+		Log("The pattern is empty.");
+		return 0;
+	}
+
+	if (callback.empty())
+	{
+		Log("The callback is empty.");
+		return 0;
+	}
+
+	PublicPtr pCallback = MakePublic(callback);
+	if (!pCallback->Exists())
+	{
+		Log("The %s callback does not exists.", callback.c_str());
+		return 0;
+	}
+
+	api.AddPost(pattern, pCallback);
+	return 1;
+}
+
+
+// -------------- token | rate limit per minute -------------- 
 
 cell Script::n_TokenExists(std::string token)
 {
@@ -95,7 +123,7 @@ cell Script::n_IsRequiredToken()
 
 
 
-//response manager
+// -------------- response manager -------------- 
 cell Script::n_SetContent(std::string content)
 {
 	const auto response = api.GetResponse();
@@ -116,9 +144,94 @@ cell Script::n_SetContentHTML(std::string html)
 	return 1;
 }
 
+cell Script::n_SetContentJSON(std::string json)
+{
+	const auto response = api.GetResponse();
+	if (!response)
+		return 0;
 
-//params
+	response->set_content(json, "application/json");
+	return 1;
+}
 
+
+// -------------- headers -------------- 
+
+cell Script::n_HasHeader(std::string param)
+{
+	const auto request = api.GetRequest();
+	if (!request)
+		return false;
+
+	return request->has_header(param);
+}
+
+cell Script::n_GetHeader(std::string param, cell* output, cell size)
+{
+	const auto request = api.GetRequest();
+	if (!request || !request->has_header(param))
+	{
+		SetString(output, "", size);
+		return false;
+	}
+	SetString(output, request->get_header_value(param), size);
+	return true;
+}
+
+cell Script::n_GetHeaderInt(std::string param)
+{
+	const auto request = api.GetRequest();
+	if (!request || !request->has_header(param))
+		return std::numeric_limits<cell>::min();
+
+	try
+	{
+		return std::stoi(request->get_header_value(param));
+	}
+	catch (...)
+	{
+	}
+
+	return std::numeric_limits<cell>::min();
+}
+
+cell Script::n_GetHeaderFloat(std::string param)
+{
+	float value = std::numeric_limits<float>::min();
+	const auto request = api.GetRequest();
+	if (!request || !request->has_header(param))
+		return amx_ftoc(value);
+
+	try
+	{
+		value = std::stof(request->get_header_value(param));
+	}
+	catch (...)
+	{
+	}
+
+	return amx_ftoc(value);
+}
+
+cell Script::n_GetHeaderBool(std::string param)
+{
+	return static_cast<bool>(this->n_GetHeaderInt(param));
+}
+
+// -------------- read body -------------- 
+cell Script::n_GetContentBody(cell* output, cell size)
+{
+	const auto request = api.GetRequest();
+	if (!request)
+		return false;
+
+	SetString(output, request->body, size);
+	return 1;
+}
+
+
+
+// -------------- params -------------- 
 cell Script::n_HasParam(std::string param)
 {
 	const auto request = api.GetRequest();
@@ -179,6 +292,9 @@ cell Script::n_GetParamBool(std::string param)
 {
 	return static_cast<bool>(this->n_GetParamInt(param));
 }
+
+
+// --------------  path params -------------- 
 
 cell Script::n_HasPathParam(std::string param)
 {

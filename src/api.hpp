@@ -41,12 +41,27 @@ public:
 	};
 
 	TokenVerify CheckToken(const std::string& token);
-	inline void AddToken(const std::string& token, int ratelimit) { this->tokens.insert(std::pair(token, TokenInfo{ratelimit, 0, std::chrono::steady_clock::now()})); }
-	inline void RemoveToken(const std::string& token) { this->tokens.erase(token); }
-	inline void ToggleTokenRequired(bool toggle) { this->bRequiredToken = true; }
-	inline bool IsTokenRequired() const { return this->bRequiredToken; }
 	TokenInfo* GetTokenInfo(const std::string& token);
-	inline bool TokenExists(const std::string& token) { return (this->tokens.find(token) != this->tokens.end()); }
+	inline void AddToken(const std::string& token, int ratelimit) 
+	{ 
+		this->tokens.insert(std::pair(token, TokenInfo{ratelimit, 0, std::chrono::steady_clock::now()})); 
+	}
+	inline void RemoveToken(const std::string& token) 
+	{ 
+		this->tokens.erase(token); 
+	}
+	inline void ToggleTokenRequired(bool toggle) 
+	{ 
+		this->bRequiredToken = true; 
+	}
+	inline bool IsTokenRequired() const 
+	{ 
+		return this->bRequiredToken; 
+	}
+	inline bool TokenExists(const std::string& token) const 
+	{ 
+		return (this->tokens.find(token) != this->tokens.end()); 
+	}
 
 	inline void SetRequest(Request* request) { this->pReqTemp = request; }
 	inline void SetResponse(Response* response) { this->pResTemp = response; }
@@ -58,7 +73,9 @@ public:
 
 	bool Start(const std::string& host, unsigned short port);
 	bool Stop();
+
 	bool AddGet(const std::string& pattern, PublicPtr& callbackPointer);
+	bool AddPost(const std::string& pattern, PublicPtr& callbackPointer);
 };
 
 extern API api;

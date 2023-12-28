@@ -14,10 +14,22 @@ public:
 	cell n_Stop();
 	cell n_IsRunning();
 	cell n_AddGet(std::string pattern, std::string callback);
+	cell n_AddPost(std::string pattern, std::string callback);
 
 	//response content
 	cell n_SetContent(std::string content);
 	cell n_SetContentHTML(std::string html);
+	cell n_SetContentJSON(std::string json);
+
+	//header
+	cell n_HasHeader(std::string header);
+	cell n_GetHeader(std::string header, cell* output, cell size);
+	cell n_GetHeaderInt(std::string header);
+	cell n_GetHeaderFloat(std::string header);
+	cell n_GetHeaderBool(std::string header);
+
+	//body
+	cell n_GetContentBody(cell* output, cell size);
 
 	//token | ratelimit per minute
 	cell n_IsRequiredToken();

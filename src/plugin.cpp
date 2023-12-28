@@ -4,6 +4,10 @@ bool Plugin::OnLoad()
 {
 	//callbacks
 	RegisterNative<&Script::n_AddGet>("API_AddGet");
+	RegisterNative<&Script::n_AddPost>("API_AddPost");
+
+
+	//server manager
 	RegisterNative<&Script::n_Start>("API_Start");
 	RegisterNative<&Script::n_Stop>("API_Stop");
 	RegisterNative<&Script::n_IsRunning>("API_IsRunning");
@@ -12,7 +16,18 @@ bool Plugin::OnLoad()
 	//response manager
 	RegisterNative<&Script::n_SetContent>("API_SetContent");
 	RegisterNative<&Script::n_SetContentHTML>("API_SetContentHTML");
+	RegisterNative<&Script::n_SetContentJSON>("API_SetContentJSON");
 
+	//header
+	RegisterNative<&Script::n_HasParam>("API_HasHeader");
+	RegisterNative<&Script::n_GetParam>("API_GetHeader");
+	RegisterNative<&Script::n_GetParamInt>("API_GetHeaderInt");
+	RegisterNative<&Script::n_GetParamFloat>("API_GetHeaderFloat");
+	RegisterNative<&Script::n_GetParamBool>("API_GetHeaderBool");
+
+
+	//body
+	RegisterNative<&Script::n_GetContentBody>("API_GetContentBody");
 
 	//token
 	RegisterNative<&Script::n_TokenExists>("API_TokenExists");

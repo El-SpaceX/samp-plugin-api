@@ -33,6 +33,7 @@
 Release/
 Debug/
 build/
+out/
 
 # Visual Studio user-specific files
 *.vcxproj.user

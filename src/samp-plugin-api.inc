@@ -13,8 +13,9 @@
 
 //handler/callbacks
 native API_AddGet(const pattern[], const callback[]);
+native API_AddPost(const pattern[], const callback[]);
 
-//server
+//server manager
 native API_Start(const ip[], port);
 native API_Stop();
 native bool:API_IsRunning();
@@ -22,6 +23,18 @@ native bool:API_IsRunning();
 //response content
 native API_SetContent(const content[]);
 native API_SetContentHTML(const HTML[]);
+native API_SetContentJSON(const json[]);
+
+//headers
+native API_HasHeader(const param[]);
+native API_GetHeader(const param[], output[], size = sizeof output);
+native API_GetHeaderInt(const param[]);
+native API_GetHeaderFloat(const param[]);
+native bool:API_GetHeaderBool(const param);
+
+//body
+native API_GetContentBody(output[], size = sizeof output);
+
 
 //token | rate limit per minute
 native API_TokenExists(const token[]);
@@ -38,7 +51,6 @@ native API_GetParamEx(const param[], output[], size = sizeof output);
 native API_GetParamInt(const param[]);
 native API_GetParamFloat(const param[]);
 native bool:API_GetParamBool(const param);
-
 
 //path params
 native API_HasPathParam(const param[]);
