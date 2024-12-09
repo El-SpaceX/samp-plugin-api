@@ -1,58 +1,41 @@
-#include "plugin.hpp"
+#include "main.hpp"
 
 bool Plugin::OnLoad() 
 {
-	//callbacks
-	RegisterNative<&Script::n_AddGet>("API_AddGet");
-	RegisterNative<&Script::n_AddPost>("API_AddPost");
 
-
-	//server manager
-	RegisterNative<&Script::n_Start>("API_Start");
-	RegisterNative<&Script::n_Stop>("API_Stop");
-	RegisterNative<&Script::n_IsRunning>("API_IsRunning");
-
-
-	//response manager
-	RegisterNative<&Script::n_SetContent>("API_SetContent");
-	RegisterNative<&Script::n_SetContentHTML>("API_SetContentHTML");
-	RegisterNative<&Script::n_SetContentJSON>("API_SetContentJSON");
+	RegisterNative<&Script::WAPI_Run>("WAPI_Run");
+	RegisterNative<&Script::WAPI_Stop>("WAPI_Stop");
+	RegisterNative<&Script::WAPI_IsRunning>("WAPI_IsRunning");
+	RegisterNative<&Script::WAPI_AddRoute>("WAPI_AddRoute");
+	RegisterNative<&Script::WAPI_SetContent>("WAPI_SetContent");
 
 	//header
-	RegisterNative<&Script::n_HasParam>("API_HasHeader");
-	RegisterNative<&Script::n_GetParam>("API_GetHeader");
-	RegisterNative<&Script::n_GetParamInt>("API_GetHeaderInt");
-	RegisterNative<&Script::n_GetParamFloat>("API_GetHeaderFloat");
-	RegisterNative<&Script::n_GetParamBool>("API_GetHeaderBool");
-
-
-	//body
-	RegisterNative<&Script::n_GetContentBody>("API_GetContentBody");
-
-	//token
-	RegisterNative<&Script::n_TokenExists>("API_TokenExists");
-	RegisterNative<&Script::n_AddToken>("API_AddToken");
-	RegisterNative<&Script::n_RemoveToken>("API_RemoveToken");
-	RegisterNative<&Script::n_GetRateLimit>("API_GetRateLimit");
-	RegisterNative<&Script::n_SetRateLimit>("API_SetRateLimit");
-	RegisterNative<&Script::n_ToggleTokenRequired>("API_ToggleRequiredToken");
-	RegisterNative<&Script::n_IsRequiredToken>("API_IsRequiredToken");
+	RegisterNative<&Script::WAPI_HasHeader>("WAPI_HasHeader");
+	RegisterNative<&Script::WAPI_GetHeader>("WAPI_GetHeader");
+	RegisterNative<&Script::WAPI_GetHeaderInt>("WAPI_GetHeaderInt");
+	RegisterNative<&Script::WAPI_GetHeaderFloat>("WAPI_GetHeaderFloat");
 
 	//params
-	RegisterNative<&Script::n_HasParam>("API_HasParam");
-	RegisterNative<&Script::n_GetParam>("API_GetParamEx");
-	RegisterNative<&Script::n_GetParamInt>("API_GetParamInt");
-	RegisterNative<&Script::n_GetParamFloat>("API_GetParamFloat");
-	RegisterNative<&Script::n_GetParamBool>("API_GetParamBool");
+	RegisterNative<&Script::WAPI_HasParam>("WAPI_HasParam");
+	RegisterNative<&Script::WAPI_GetParam>("WAPI_GetParam");
+	RegisterNative<&Script::WAPI_GetParamInt>("WAPI_GetParamInt");
+	RegisterNative<&Script::WAPI_GetParamFloat>("WAPI_GetParamFloat");
 
-	//path params
-	RegisterNative<&Script::n_HasPathParam>("API_HasPathParam");
-	RegisterNative<&Script::n_GetPathParam>("API_GetPathParamEx");
-	RegisterNative<&Script::n_GetPathParamInt>("API_GetPathParamInt");
-	RegisterNative<&Script::n_GetPathParamFloat>("API_GetPathParamFloat");
-	RegisterNative<&Script::n_GetPathParamBool>("API_GetPathParamBool");
+	//path-params
+	RegisterNative<&Script::WAPI_HasPathParam>("WAPI_HasPathParam");
+	RegisterNative<&Script::WAPI_GetPathParam>("WAPI_GetPathParam");
+	RegisterNative<&Script::WAPI_GetPathParamInt>("WAPI_GetPathParamInt");
+	RegisterNative<&Script::WAPI_GetPathParamFloat>("WAPI_GetPathParamFloat");
 
-	Log("plugin loaded.");
+	//body
+	RegisterNative<&Script::WAPI_GetContentBody>("WAPI_GetContentBody");
+	RegisterNative<&Script::WAPI_GetBodySize>("WAPI_GetBodySize");
+
+	Log("\n\n\
+	|- %s (%s)\n\
+	|- Author: El-Spacex\n\
+	|- Compiled: %s\
+	\n\n", Name(), VersionAsString().c_str(), __DATE__);
 	return true;
 }
 

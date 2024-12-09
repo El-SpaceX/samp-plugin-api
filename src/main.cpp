@@ -1,6 +1,7 @@
 #include "main.hpp"
 
 
+WebAPI webAPI;
 
 PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData) 
 {

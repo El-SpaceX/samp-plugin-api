@@ -1,36 +1,38 @@
 #include <a_samp>
-#include <samp-plugin-api>
+#include <samp-web-api>
 
 main() {}
 
-API_CALLBACK OnParam(const ip[], port)
+WAPI_ROUTE:OnParam(const ip[], port)
 {
-	if(!API_HasParam("int") || !API_HasParam("float") || !API_HasParam("str"))
+	if(!WAPI_HasParam("int") || !WAPI_HasParam("float") || !WAPI_HasParam("str"))
 	{
-		API_SetContent("Invalid params");
+		WAPI_SetContent("Invalid params");
 		return 500;
 	}
 
-	static str[256];
-	format(str, sizeof str, "Int = %d | Float = %f | str = %s", API_GetParamInt("int"), API_GetParamFloat("float"), API_GetParam("str"));
-	API_SetContent(str);
+	static response[256], str[32];
+	WAPI_GetParam("str", str);
+	format(response, sizeof response, "Int = %d | Float = %f | str = %s", WAPI_GetParamInt("int"), WAPI_GetParamFloat("float"), str);
+	WAPI_SetContent(response);
 	return 200;
 }
 
-API_CALLBACK OnPathParams(const ip[], port)
+WAPI_ROUTE:OnPathParams(const ip[], port)
 {
-	static str[256];
-	format(str, sizeof str, "Int = %d | Float = %f | str = %s", API_GetPathParamInt("int"), API_GetPathParamFloat("float"), API_GetPathParam("str"));
-	API_SetContent(str);
+	static response[256], str[32];
+	WAPI_GetPathParam("str", str);
+	format(response, sizeof response, "Int = %d | Float = %f | str = %s", WAPI_GetPathParamInt("int"), WAPI_GetPathParamFloat("float"), str);
+	WAPI_SetContent(response);
 	return 200;
 }
 
 
 public OnGameModeInit()
 {
-	API_AddGet("/param", "OnParam"); 							//  http://localhost:8080/param?int=number&float=number&str=src
-	API_AddGet("/param_path/:int/:float/:str", "OnPathParams"); // 	http://localhost:8080/number/number/src
-	API_Start("localhost", 8080);
+	WAPI_AddRoute(METHOD_GET, "/param", "OnParam");								//  http://localhost:8080/param?int=number&float=number&str=src
+	WAPI_AddRoute(METHOD_GET, "/param_path/:int/:float/:str", "OnPathParams");	// 	http://localhost:8080/number/float/src
+	WAPI_Run("localhost", 8080);
 	return 1;
 }
 

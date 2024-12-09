@@ -1,18 +1,18 @@
 #include <a_samp>
-#include <samp-plugin-api>
+#include <samp-web-api>
 
 main() {}
 
-API_CALLBACK OnHTML(const ip[], port)
+WAPI_ROUTE:OnHTML(const ip[], port)
 {
-	API_SetContentHTML("<html><button onclick=\"alert('Oh Yes')\">Click here</button></html>");
+	WAPI_SetContent("<html><button onclick=\"alert('Clicked')\">Click here</button></html>", "text/html");
 	return 200;
 }
 
 public OnGameModeInit()
 {
-	API_AddGet("/html", "OnHTML");
-	API_Start("localhost", 8080);
+	WAPI_AddRoute(METHOD_GET, "/html", "OnHTML");
+	WAPI_Run("localhost", 5000);
 	return 1;
 }
 

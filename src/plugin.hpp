@@ -1,17 +1,12 @@
-#ifndef _PLUGIN_H_
-#define _PLUGIN_H_
-
-#include <samp-ptl/ptl.h>
-#include "script.hpp"
+#pragma once
 
 class Plugin : public ptl::AbstractPlugin<Plugin, Script> 
 {
 public: 
-	inline const char* Name() { return "samp-plugin-api"; }
+	inline const char* Name() { return "samp-web-api"; }
+	int Version() { return PAWN_WEBAPI_VERSION; }
 	bool OnLoad();
 	bool OnUnload();
 	static Plugin& Get() { return Instance(); }
 private:
 };
-
-#endif

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(samp-plugin-api)
+project(samp-web-api)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
@@ -12,14 +12,15 @@ add_samp_plugin(${PROJECT_NAME}
 
 	src/main.hpp
 	src/main.cpp
-	src/plugin.hpp
-	src/plugin.cpp
+	src/utils.hpp
+	src/web_api.hpp
+	src/web_api.cpp
 	src/script.hpp
 	src/script.cpp
-	src/api.hpp
-	src/api.cpp
+	src/plugin.hpp
+	src/plugin.cpp
 
-	
+
 	lib/cpp-httplib/httplib.h
 	lib/samp-ptl/ptl.h
 )

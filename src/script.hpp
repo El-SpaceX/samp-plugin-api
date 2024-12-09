@@ -1,60 +1,37 @@
-#ifndef _NATIVES_H_
-#define _NATIVES_H_
+#pragma once
 
-#include <samp-ptl/ptl.h>
-#include "api.hpp"
-
-using Token = std::string;
 
 class Script : public ptl::AbstractScript<Script>
 {
 public:
-	//server manager
-	cell n_Start(std::string host, cell port);
-	cell n_Stop();
-	cell n_IsRunning();
-	cell n_AddGet(std::string pattern, std::string callback);
-	cell n_AddPost(std::string pattern, std::string callback);
+	cell WAPI_Run(std::string host, int port);
+	cell WAPI_Stop();
+	cell WAPI_IsRunning();
+	cell WAPI_AddRoute(int method, std::string pattern, std::string callback);
+	
+	cell WAPI_SetContent(std::string content, std::string content_type);
+	
+	//headers
+	cell WAPI_HasHeader(std::string header);
+	cell WAPI_GetHeader(std::string header, cell* output, cell size);
+	cell WAPI_GetHeaderInt(std::string header);
+	cell WAPI_GetHeaderFloat(std::string header);
 
-	//response content
-	cell n_SetContent(std::string content);
-	cell n_SetContentHTML(std::string html);
-	cell n_SetContentJSON(std::string json);
-
-	//header
-	cell n_HasHeader(std::string header);
-	cell n_GetHeader(std::string header, cell* output, cell size);
-	cell n_GetHeaderInt(std::string header);
-	cell n_GetHeaderFloat(std::string header);
-	cell n_GetHeaderBool(std::string header);
-
-	//body
-	cell n_GetContentBody(cell* output, cell size);
-
-	//token | ratelimit per minute
-	cell n_IsRequiredToken();
-	cell n_ToggleTokenRequired(cell toggle);
-	cell n_TokenExists(std::string token);
-
-	cell n_AddToken(std::string token, cell ratelimit);
-	cell n_RemoveToken(std::string token);
-	cell n_GetRateLimit(std::string token);
-	cell n_SetRateLimit(std::string token, cell ratelimit);
-
-	//params
-	cell n_HasParam(std::string param);
-	cell n_GetParam(std::string param, cell* output, cell size);
-	cell n_GetParamInt(std::string param);
-	cell n_GetParamFloat(std::string param);
-	cell n_GetParamBool(std::string param);
-
+	//url params
+	cell WAPI_HasParam(std::string param);
+	cell WAPI_GetParam(std::string param, cell* output, cell size);
+	cell WAPI_GetParamInt(std::string param);
+	cell WAPI_GetParamFloat(std::string param);
 
 	//path params
-	cell n_HasPathParam(std::string param);
-	cell n_GetPathParam(std::string param, cell* output, cell size);
-	cell n_GetPathParamInt(std::string param);
-	cell n_GetPathParamFloat(std::string param);
-	cell n_GetPathParamBool(std::string param);
+	cell WAPI_HasPathParam(std::string param);
+	cell WAPI_GetPathParam(std::string param, cell* output, cell size);
+	cell WAPI_GetPathParamInt(std::string param);
+	cell WAPI_GetPathParamFloat(std::string param);
+
+	//body request
+	cell WAPI_GetBodySize();
+	cell WAPI_GetContentBody(cell* output, cell size);
+
 private:
 };
-#endif
